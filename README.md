@@ -11,11 +11,11 @@ For low-level acoustic features, Authors extract a set of 1582 features using th
 * Tensorflow for Adversarial Auto-encoders
 * scikit-learn for acurracy evaluation
 
-## To do
-[] parameter tunning
-
 ## References
 * [1] S. Sahu, R. Gupta, G. Sivaraman, W. AbdAlmageed, and C. Espy-Wilson, "Adversarial Auto-encoders for Speech Based Emotion Recogntion," in Proc. Interspeech, 2017.
+
+## TODO
+- [ ] parameter tunning
 
 
 
