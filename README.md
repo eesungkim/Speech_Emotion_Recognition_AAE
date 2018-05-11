@@ -4,7 +4,6 @@ For low-level acoustic features, Authors extract a set of 1582 features using th
 
 ## Datasets
 * Interactive Emotional Dyadic Motion Capture (IEMOCAP) database is required to run this code.
-* It used only improvised data for context-independent situation evaluation.
 
 ## Dependencies
 * openSMILE for low-level acoustic features extraction
