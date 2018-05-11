@@ -1,5 +1,5 @@
 """
-code from https://github.com/hwalsuklee/tensorflow-mnist-AAE/blob/master/aae.py
+code from https://github.com/hwalsuklee/tensorflow-mnist-AAE
 Most codes from https://github.com/musyoku/adversarial-autoencoder/blob/master/aae/sampler.py
 """
 import numpy as np
