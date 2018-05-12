@@ -43,17 +43,14 @@ def extract_code_vector(args,idx):
     train_labels    = utils.dense_to_one_hot(y_train,num_classes) #tf.one_hot(y_train, num_classes) 
     test_labels     = utils.dense_to_one_hot(y_test,num_classes) #tf.one_hot(y_test, num_classes) #
 
-    # network architecture
     n_hidden = args.n_hidden
     dim_features = train_total_data.shape[1]
     dim_z = 2                      # to visualize learned manifold
     nDrop_out= 0.5
-    display_step=100
-    
-    # train
     n_epochs = args.num_epochs
     batch_size = n_samples
     learn_rate = args.learn_rate
+    display_step=args.num_epochs/3
 
     """ build graph """
     tf.reset_default_graph()  
@@ -176,7 +173,7 @@ def evaluate(idx):
     clf = svm.SVC(kernel='rbf',gamma=0.001, C=100,cache_size=20000)
     clf.fit(X_train, y_train)
     y_pred=clf.predict(X_test)
-    
+
 
 
     test_weighted_accuracy=clf.score(X_test, y_test)
