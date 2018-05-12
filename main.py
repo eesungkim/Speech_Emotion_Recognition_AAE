@@ -159,22 +159,9 @@ def evaluate(idx):
         
     #X_train, X_test= utils.normalize_Zscore(X_train, X_test)
     #X_train, X_test, norm = utils.normalize_MinMax(X_train, X_test)
-
-    from sklearn.model_selection import GridSearchCV 
-    '''
-    parameters = {'C':[np.power(2,4), np.power(2,5), np.power(2,6),np.power(2,7), 100,], 'gamma': 
-              [ 1/np.power(2,9),1/np.power(2,10),0.0001]}
-
-    svr = svm.SVC(kernel='rbf')
-    clf = GridSearchCV(svr, parameters)
-    clf.fit(X_train, y_train)
-    y_pred = clf.predict(X_test)
-    '''
     clf = svm.SVC(kernel='rbf',gamma=0.001, C=100,cache_size=20000)
     clf.fit(X_train, y_train)
     y_pred=clf.predict(X_test)
-
-
 
     test_weighted_accuracy=clf.score(X_test, y_test)
 
