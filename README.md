@@ -13,6 +13,3 @@ For low-level acoustic features, Authors extract a set of 1582 features using th
 ## References
 * [1] S. Sahu, R. Gupta, G. Sivaraman, W. AbdAlmageed, and C. Espy-Wilson, "Adversarial Auto-encoders for Speech Based Emotion Recogntion," in Proc. Interspeech, 2017.
 * [2] AAE implementation has been based on [tensorflow-mnist-AAE repository](https://github.com/hwalsuklee/tensorflow-mnist-AAE)
-
-## TODO
-- [ ] parameter tunning

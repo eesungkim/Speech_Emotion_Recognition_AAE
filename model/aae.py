@@ -86,20 +86,21 @@ def discriminator(z, n_hidden, n_output, keep_prob, reuse=False):
     return tf.sigmoid(y), y
 
 # Gateway
-def adversarial_autoencoder(x_hat, x, x_id, z_sample, z_id, dim_img, dim_z, n_hidden, keep_prob):
+def adversarial_autoencoder(x_hat, x, x_id, z_sample, z_id, dim_input, dim_z, n_hidden, keep_prob):
     ## Reconstruction Loss
     # encoding
     z = MLP_encoder(x_hat, n_hidden, dim_z, keep_prob)
 
     # decoding
-    y = MLP_decoder(z, n_hidden, dim_img, keep_prob)
+    y = MLP_decoder(z, n_hidden, dim_input, keep_prob)
 
     # loss
     marginal_likelihood = -tf.reduce_mean(tf.reduce_mean(tf.squared_difference(x,y)))
 
     ## GAN Loss
-    z_real = tf.concat([z_sample, z_id],1)
+    
     z_fake = tf.concat([z, x_id],1)
+    z_real = tf.concat([z_sample, z_id],1)
     D_real, D_real_logits = discriminator(z_real, (int)(n_hidden), 1, keep_prob)
     D_fake, D_fake_logits = discriminator(z_fake, (int)(n_hidden), 1, keep_prob, reuse=True)
 
@@ -124,6 +125,6 @@ def encoder(x, n_hidden, dim_z):
     z = MLP_encoder(x, n_hidden, dim_z,  1.0, reuse=True)
     return z
 
-def decoder(z, dim_img, n_hidden):
-    y = MLP_decoder(z, n_hidden, dim_img, 1.0, reuse=True)
+def decoder(z, dim_input, n_hidden):
+    y = MLP_decoder(z, n_hidden, dim_input, 1.0, reuse=True)
     return y

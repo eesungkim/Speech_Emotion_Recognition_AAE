@@ -17,17 +17,18 @@ def parse_args():
                         help='The type of prior')
     parser.add_argument('--n_hidden', type=int, default=1000, help='Number of hidden units in MLP')
     parser.add_argument('--learn_rate', type=float, default=1e-3, help='Learning rate for Adam optimizer')
-    parser.add_argument('--num_epochs', type=int, default=5, help='The number of epochs to run')
-    parser.add_argument('--batch_size', type=int, default=1582, help='Batch size')
+    parser.add_argument('--num_epochs', type=int, default=300, help='The number of epochs to run')
+    parser.add_argument('--batch_size', type=int, default=385, help='Batch size')
 
     return parser.parse_args()
 
 def extract_code_vector(args,idx):
     """ prepare IEMOCAP data """
-    path_X_Uttr_train  = "datasets/0%s/X_Paralinguistic_train"%idx
+
+    path_X_Uttr_train  = "datasets/0%s/X_stat_Utter_train"%idx
     path_y_Uttr_train  = "datasets/0%s/y_Utter_train"%idx
 
-    path_X_Uttr_test   = "datasets/0%s/X_Paralinguistic_test"%idx
+    path_X_Uttr_test   = "datasets/0%s/X_stat_Utter_test"%idx
     path_y_Uttr_test   = "datasets/0%s/y_Utter_test"%idx
     
     train_total_data    = np.load('%s.npy' % path_X_Uttr_train)
@@ -47,6 +48,7 @@ def extract_code_vector(args,idx):
     dim_features = train_total_data.shape[1]
     dim_z = 2                      # to visualize learned manifold
     nDrop_out= 0.5
+    display_step=100
     
     # train
     n_epochs = args.num_epochs
@@ -57,9 +59,9 @@ def extract_code_vector(args,idx):
     tf.reset_default_graph()  
     # input placeholders
     # In denoising-autoencoder, x_hat == x + noise, otherwise x_hat == x
-    x_hat = tf.placeholder(tf.float32, shape=[None, dim_features], name='input_img')
-    x = tf.placeholder(tf.float32, shape=[None, dim_features], name='target_img')
-    x_id = tf.placeholder(tf.float32, shape=[None, num_classes], name='input_img_label')
+    x_hat = tf.placeholder(tf.float32, shape=[None, dim_features], name='input')
+    x = tf.placeholder(tf.float32, shape=[None, dim_features], name='target')
+    x_id = tf.placeholder(tf.float32, shape=[None, num_classes], name='input_label')
 
     # dropout
     keep_prob = tf.placeholder(tf.float32, name='keep_prob')
@@ -71,6 +73,7 @@ def extract_code_vector(args,idx):
     # network architecture
     y, z, neg_marginal_likelihood, D_loss, G_loss = aae.adversarial_autoencoder(x_hat, x, x_id, z_sample, z_id, dim_features,
                                                                                 dim_z, n_hidden, keep_prob)
+    z_train=aae.encoder(x, n_hidden, dim_z)
     z_test=aae.encoder(x, n_hidden, dim_z)
 
     # optimization
@@ -130,24 +133,25 @@ def extract_code_vector(args,idx):
                 for _ in range(2):
                     _, g_loss = sess.run(
                         (train_op_g, G_loss),
-                        feed_dict={x_hat: test_data, x: test_data, x_id: test_labels, z_sample: samples,
+                        feed_dict={x_hat: batch_xs_input, x: batch_xs_target, x_id: batch_ids_input, z_sample: samples,
                                    z_id: z_id_one_hot_vector, keep_prob: nDrop_out})
     
             tot_loss = loss_likelihood + d_loss + g_loss
             # print cost every epoch
-            print("epoch %d: L_tot %03.2f L_likelihood %03.2f d_loss %03.2f g_loss %03.2f" % (epoch, tot_loss, loss_likelihood, d_loss, g_loss))
+            if (epoch % display_step) == 0:
+                print("epoch %d: L_tot %03.2f L_likelihood %03.2f d_loss %03.2f g_loss %03.2f" % (epoch, tot_loss, loss_likelihood, d_loss, g_loss))
         
         """ generate code-vectors """
-        X_train = sess.run((z_test), feed_dict={x: train_total_data})
+        X_train = sess.run((z_train), feed_dict={x: train_total_data})
         X_test = sess.run((z_test), feed_dict={x: test_data})
         
         data={'X_Utter_train':X_train, 'X_Utter_test':X_test, 'y_Utter_train':y_train, 'y_Utter_test':y_test}
-        filename   = "datasets/0%s/X.pickle"     %idx
+        filename   = "datasets/0%s/Z.pickle"     %idx
         with open(filename, 'wb') as handle:
             pickle.dump(data, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
 def evaluate(idx):
-    filename  = "datasets/0%d/X.pickle"  %idx
+    filename  = "datasets/0%d/Z.pickle"  %idx
     with open(filename, 'rb') as handle:
         data = pickle.load(handle)
         
@@ -160,7 +164,7 @@ def evaluate(idx):
     #X_train, X_test, norm = utils.normalize_MinMax(X_train, X_test)
 
     from sklearn.model_selection import GridSearchCV 
-
+    '''
     parameters = {'C':[np.power(2,4), np.power(2,5), np.power(2,6),np.power(2,7), 100,], 'gamma': 
               [ 1/np.power(2,9),1/np.power(2,10),0.0001]}
 
@@ -168,6 +172,11 @@ def evaluate(idx):
     clf = GridSearchCV(svr, parameters)
     clf.fit(X_train, y_train)
     y_pred = clf.predict(X_test)
+    '''
+    clf = svm.SVC(kernel='rbf',gamma=0.001, C=100,cache_size=20000)
+    clf.fit(X_train, y_train)
+    y_pred=clf.predict(X_test)
+    
 
 
     test_weighted_accuracy=clf.score(X_test, y_test)
