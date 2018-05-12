@@ -196,7 +196,7 @@ if __name__ == '__main__':
     args = parse_args()
     
     acc_stat=np.zeros(2)
-    for idx in range(10):
+    for idx in range(1):
         extract_code_vector(args,idx) 
         acc_stat += evaluate(idx)
     print('[ %s ]'%(acc_stat/10))
