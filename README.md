@@ -9,7 +9,3 @@ For low-level acoustic features, Authors extract a set of 1582 features using th
 * openSMILE for low-level acoustic features extraction
 * Tensorflow for Adversarial Auto-encoders
 * scikit-learn for classification and performance evaluation
-
-## References
-* [1] S. Sahu, R. Gupta, G. Sivaraman, W. AbdAlmageed, and C. Espy-Wilson, "Adversarial Auto-encoders for Speech Based Emotion Recogntion," in Proc. Interspeech, 2017.
-* [2] AAE implementation has been based on [tensorflow-mnist-AAE repository](https://github.com/hwalsuklee/tensorflow-mnist-AAE)
